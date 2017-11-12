@@ -117,7 +117,7 @@ public class Serializer {
 
                         if (obj.getClass().isArray()) {
                             field.setAttribute((new Attribute("Length", String.valueOf(Array.getLength(field1.get(obj))))));
-                            for (int i = 0; i < Array.getLength(field1.get(obj); i++){
+                            for (int i = 0; i < Array.getLength(field1.get(obj)); i++){
                                 fieldValue = String.valueOf(Array.get(field1.get(obj), i));
                                 value = new Element("Value");
                                 value.addContent(fieldValue);
