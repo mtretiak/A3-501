@@ -1,16 +1,20 @@
-import org.jdom2.Attribute;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
-
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.*;
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Vector;
+import org.jdom2.Attribute;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 
 /**
  * Created by mtretiak on 2017-11-11.
@@ -25,7 +29,7 @@ public class Serializer {
         String hashSize = Integer.toString(hashMap.size());
         hashMap.put(obj, hashSize);
 
-        Element root = new Element("Serialized");
+        Element root = new Element("serialized");
         Document document = new Document(root);
 
         try{
@@ -43,12 +47,14 @@ public class Serializer {
 
                 String id = String.valueOf(hashMap.get(obj));
 
-                Element object = new Element("Object ");
-                object.setAttribute(new Attribute("ID", id));
-                object.setAttribute(new Attribute("Class", obj.getClass().getName()));
+                Element object = new Element("Object");
+                object.setAttribute(new Attribute("id", id));
+                object.setAttribute(new Attribute("class", obj.getClass().getName()));
 
 
-                Element value, field, reference = null;
+                Element value =  null;
+                Element field = null;
+                Element reference = null;
 
                 ArrayList<Element> fieldArrayELement = new ArrayList<>();
                 ArrayList<Element> objArrayElement = new ArrayList<>();
@@ -62,9 +68,9 @@ public class Serializer {
                     String fieldValue;
 
                     object = new Element("Object");
-                    object.setAttribute(new Attribute("ID", id));
-                    object.setAttribute(new Attribute("Class", obj.getClass().getName()));
-                    object.setAttribute(new Attribute("Length", String.valueOf(Array.getLength(obj))));
+                    object.setAttribute(new Attribute("id", id));
+                    object.setAttribute(new Attribute("class", obj.getClass().getName()));
+                    object.setAttribute(new Attribute("length", String.valueOf(Array.getLength(obj))));
 
                     for (int i = 0; i < Array.getLength(obj); i++) {
                         if (!Array.get(obj, i).getClass().getName().contains("java.lang")) {
@@ -73,7 +79,7 @@ public class Serializer {
                             id = Integer.toString(hashMap.size());
                             field = new Element("Field");
                             hashMap.put(Array.get(obj, i), id);
-                            objToInspect.addElement(Array.get(obj, i));
+//                            objToInspect.addElement(Array.get(obj, i));
 
                             reference = new Element("Reference");
                             reference.addContent(id);
@@ -99,24 +105,25 @@ public class Serializer {
                     String fieldDeclairedClass = field1.getDeclaringClass().getName();
 
 
-                    if (!(field1.getType().isPrimitive() || field1.get(obj).getClass().getName().contains("java.lane"))) {
+                    if (!(field1.getType().isPrimitive() || field1.get(obj).getClass().getName().contains("java.lang"))) {
                         field = new Element("Field");
                         id = Integer.toString(hashMap.size());
                         hashMap.put(field1.get(obj), id);
                         objToInspect.addElement(field1);
 
                         reference = new Element("Reference");
-                        reference.addContent(reference);
+                        reference.addContent(id);
 
                         field.setContent(reference);
                         fieldArrayELement.add(field);
 
                     } else {
                         field = new Element("Field");
-                        field.setAttribute(new Attribute("Name", fieldName));
+                        field.setAttribute(new Attribute("name", fieldName));
+                        field.setAttribute(new Attribute("declaringClass", fieldDeclairedClass));
 
                         if (obj.getClass().isArray()) {
-                            field.setAttribute((new Attribute("Length", String.valueOf(Array.getLength(field1.get(obj))))));
+                            field.setAttribute((new Attribute("length", String.valueOf(Array.getLength(field1.get(obj))))));
                             for (int i = 0; i < Array.getLength(field1.get(obj)); i++){
                                 fieldValue = String.valueOf(Array.get(field1.get(obj), i));
                                 value = new Element("Value");
@@ -136,7 +143,7 @@ public class Serializer {
                     object.setContent(fieldArrayELement);
                 }
 
-                document.getRootElement().addContent(fieldArrayELement);
+                document.getRootElement().addContent(object);
 
 
                 XMLOutputter xmlOutputter = new XMLOutputter();

@@ -26,7 +26,7 @@ public class Client {
         while(!stop){
             System.out.print("Enter a command to be sent to the server or 'Exit' to quit: ");
 
-            while (((!inputClient.ready() && !inputBuffer.ready()))){
+            while ((!inputClient.ready() && !inputBuffer.ready())){
 
             }
             if(inputClient.ready()){
@@ -49,6 +49,7 @@ public class Client {
                 objOutput.writeObject(test.readObject());
                 objOutput.close();
 
+                System.out.println("HERE");
 
                 System.out.println("Client Sent File");
 

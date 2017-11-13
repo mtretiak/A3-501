@@ -1,5 +1,4 @@
-import javax.swing.text.Document;
-import javax.xml.crypto.Data;
+import org.jdom2.Document;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -26,6 +25,8 @@ public class Server {
 
 
         while(!stop){
+
+
             clientString = inputFromClient.readLine();
             System.out.println("String Received from Client: " + clientString);
 
@@ -37,10 +38,10 @@ public class Server {
                 clientString = "";
                 DummbyObject objTest = new DummbyObject();
 
-                Document document = (Document) Serializer.serializeObj(objTest);
+                Document document = Serializer.serializeObj(objTest);
                 File outputFile = new File("outputFile.xml");
 
-                //Deserialize
+                Deserializer.deserialize(document);
 
                 FileOutputStream fileOutputStream = new FileOutputStream(outputFile);
                 ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
