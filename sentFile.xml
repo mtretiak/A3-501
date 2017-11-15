@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<serialized>
+  <object class="SimpleObj" id="0">
+    <field name="simpleInt" declaringClass="SimpleObj">
+      <value>1</value>
+    </field>
+    <field name="simpleDouble" declaringClass="SimpleObj">
+      <value>1.0</value>
+    </field>
+  </object>
+</serialized>

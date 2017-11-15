@@ -1,4 +1,9 @@
 import java.io.File;
+import java.io.ObjectOutputStream;
+import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
+import java.util.HashMap;
 import java.util.List;
 
 import org.jdom2.Attribute;
@@ -13,37 +18,125 @@ import org.jdom2.input.SAXBuilder;
 public class Deserializer {
 
 
-    public static void deserialize(Document document){
+    public static Object deserialize(Document document){
 
-        SAXBuilder saxBuilder = new SAXBuilder();
-        File xmlFile = new File("xmlFile.xml");
-
-
-        Element rootNode = document.getRootElement();
-        List list = rootNode.getChildren("Object");
+       Element root = document.getRootElement();
+       List objectList = root.getChildren();
+       HashMap hashMap = new HashMap();
+       Object object = null;
 
 
-        for(int i = 0; i<list.size(); i++){
-            Element node = (Element) list.get(i);
+       try{
+           createObject(objectList, hashMap);
 
-            for(Attribute attribute : node.getAttributes()){
-                System.out.println("--------------------------------------------------");
-                System.out.println("Object Attribute " + attribute);
-            }
+           setFields(objectList, hashMap);;
 
-            System.out.println("--------------------------------------------------");
+           object = hashMap.get("0");
+       }catch (Exception e){
+           e.printStackTrace();
+       }
 
-            for(Element field : node.getChildren()){
-                for(Attribute attribute : field.getAttributes()){
-                    System.out.println("Value ----- " + attribute);
+
+       return object;
+
+    }
+
+
+
+    public static void createObject(List objectList, HashMap hashMap){
+
+        for(int i = 0; i<objectList.size();i++){
+            try{
+                Element objectE = (Element) objectList.get(i);
+
+                Class objectClass = Class.forName(objectE.getAttributeValue("class"));
+
+                Object objectInstance;
+                if(objectClass.isArray()){
+
+                    int length = Integer.parseInt(objectE.getAttributeValue("length"));
+
+                    Class type = objectClass.getComponentType();
+
+                    objectInstance = Array.newInstance(type, length);
+                }else{
+
+                    Constructor constructor = objectClass.getConstructor(null);
+
+                    if(!Modifier.isPublic(constructor.getModifiers())){
+                        constructor.setAccessible(true);
+                    }
+
+                    objectInstance = constructor.newInstance(null);
                 }
-                for(Content content : field.getContent()){
-                    System.out.println("Value ----- " + content.getValue());
-                }
+
+                String objectId = objectE.getAttributeValue("id");
+                hashMap.put(objectId, objectInstance);
+             }catch (Exception e){
+                e.printStackTrace();
+
             }
 
         }
 
+    }
 
+    public static void setFields(List objectList, HashMap hashMap){
+        for(int i = 0; i<objectList.size(); i++){
+            try{
+                Element objectE = (Element) objectList.get(i);
+                Object objectInstance = hashMap.get(objectE.getAttributeValue("id"));
+                List children = objectE.getChildren();
+
+                Class objectClass = objectInstance.getClass();
+                System.out.println(objectClass.getName());
+
+                if(objectClass.isArray()){
+                    Class type = objectClass.getComponentType();
+                    for(int n = 0; n < children.size(); n++){
+                        Element arrayElements = (Element) children.get(n);
+
+                        Object object;
+
+                        String elementType = arrayElements.getName();
+
+                        if(elementType.equals("reference")){
+                            object = hashMap.get(arrayElements.getText());
+                        }else if(elementType.equals("value")){
+                            object = deserializeField(type, arrayElements);
+                        }else{
+                            object = arrayElements.getText();
+                        }
+                    }
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+
+    public static Object deserializeField(Class type, Element value){
+
+        Object valueObject = null;
+
+        if(type.equals(boolean.class)){
+            String bool = value.getText();
+        }else if (type.equals(byte.class)){
+            valueObject = Byte.valueOf(value.getText());
+        }else if (type.equals(double.class)){
+            valueObject = Double.valueOf(value.getText());
+        }else if (type.equals(float.class)){
+            valueObject = Float.valueOf(value.getText());
+        }else if (type.equals(int.class)){
+            valueObject = Integer.valueOf(value.getText());
+        }else if (type.equals(long.class)){
+            valueObject = Long.valueOf(value.getText());
+        }else if (type.equals(short.class)){
+            valueObject = Short.valueOf(value.getText());
+        }
+
+        return valueObject;
     }
 }
