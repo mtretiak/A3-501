@@ -31,6 +31,7 @@ public class Client {
         int port = Integer.parseInt(args[1]);
         boolean stop = false;
         String objectToCreate;
+        ObjectCreator objCreator = new ObjectCreator();
 
         if (args.length != 2){
             System.out.println("Must enter two (2) arguments, <Server IP Address> <Server Forwarding Port>");
@@ -68,163 +69,32 @@ public class Client {
 
             //filter which object to create
             if(objectToCreate.equals("simple")){
-                objectArray.add(createSimpleObj());
+                objectArray.add(objCreator.createSimpleObj());
             }
-            if(objectToCreate.equals("reference")){
-                objectArray.add(createRefObj());
+            else if(objectToCreate.equals("reference")){
+                objectArray.add(objCreator.createRefObj());
             }
-            if(objectToCreate.equals("simple_array")){
-                objectArray.add(createSimpleArray());
+            else if(objectToCreate.equals("simple_array")){
+                objectArray.add(objCreator.createSimpleArray());
             }
-            if(objectToCreate.equals("reference_array")){
-                objectArray.add(createRefArray());
+            else if(objectToCreate.equals("reference_array")){
+                objectArray.add(objCreator.createRefArray());
             }
-
             //collection not working
-            if(objectToCreate.equals("collection")){
-                objectArray.add(createRefObj());
+            else if(objectToCreate.equals("collection")){
+                objectArray.add(objCreator.createRefObj());
             }
-            if(objectToCreate.equals("send")){
+            else if(objectToCreate.equals("send")){
                 serializeObjects(host, port);
             }
-            if(objectToCreate.equals("stop")){
+            else if(objectToCreate.equals("stop")){
                 System.out.println("Goodbye");
                 System.exit(1);
+            }else{
+                System.out.println("Input does not look correct, try again.");
             }
         }
     }
-
-
-    /**
-     * createSimpleObj
-     * purpose: to create a simple object with. user will enter int, double, float, and byte values
-     * parameters: none
-     * @return SimpleObj
-     */
-    private static SimpleObj createSimpleObj(){
-
-        //prompt for user input
-        System.out.println("Enter the parameters for your simple object. One at a time.");
-
-        SimpleObj simpleObj = null;
-        Scanner input = new Scanner(System.in);
-
-        //prompt for user input of first parameter in our simple object
-        System.out.println("Please enter the Integer parameter: eg. 1,2,89");
-
-        //while scanner does not get an Int prompt user again!
-        while(!input.hasNextInt()){
-            input.next();
-            System.out.println("No no no. Simple object needs an Integer value. Try again: ");
-        }
-
-        //once we have good input set parameter
-        int integerParameter = input.nextInt();
-
-        System.out.println("PLease enter the Double parameter: eg. 2.0, 1000.1");
-        while (!input.hasNextDouble()){
-            System.out.println("Come on ... Simple object needs a Double value. Try again: eg. 2.0 ");
-        }
-
-        double doubleParameter = input.nextDouble();
-
-
-        System.out.println("PLease enter the Float parameter: eg. 65");
-        while (!input.hasNextFloat()){
-            System.out.println("Come on ... Simple object needs a float value. Try again:  ");
-        }
-
-        float floatParameter = input.nextFloat();
-
-        System.out.println("PLease enter the byte parameter: eg. 2");
-        while (!input.hasNextByte()){
-            System.out.println("Come on ... Simple object needs a byte value. Try again: eg. 2 ");
-        }
-
-        byte byteParameter = input.nextByte();
-
-
-        //creates simple object with userInput parameters
-        simpleObj = new SimpleObj(integerParameter,doubleParameter, floatParameter, byteParameter);
-        System.out.print("Your simple object has bee created with " + integerParameter + " and " + doubleParameter + " as parameters.");
-
-
-        return simpleObj;
-    }
-
-    /**
-     * createSimpleArray
-     * purpose: create an array. needs user input for length
-     * @return
-     */
-    private static SimpleArray createSimpleArray() {
-        System.out.println("Enter the length of your array: ");
-
-        Scanner userInput = new Scanner(System.in);
-
-        while (!userInput.hasNextInt()) {
-            userInput.next();
-            System.out.println("Be sure to enter an integer value please!");
-        }
-
-        int length = userInput.nextInt();
-        int[] newArray = new int[length];
-
-        SimpleArray simpleArray = new SimpleArray(newArray);
-        System.out.println("simple array has been made.");
-        return simpleArray;
-    }
-
-
-    /**
-     * createRefArray
-     * purpose: creates an object array of simple objects.
-     * User input is needed to create the simple objects
-     * @return
-     */
-    private static RefArray createRefArray(){
-        System.out.println("Enter the length of your array: ");
-
-        Scanner userInput = new Scanner(System.in);
-
-        while (!userInput.hasNextInt()) {
-            userInput.next();
-            System.out.println("Be sure to enter an integer value please!");
-        }
-
-        int length = userInput.nextInt();
-        Object[] newArray = new Object[length];
-
-        for(int i = 0; i<length; i++){
-            SimpleObj simpleObj = createSimpleObj();
-            newArray[i] = simpleObj;
-        }
-
-        RefArray refArray = new RefArray(newArray);
-        System.out.println("reference array has been made.");
-        return refArray;
-
-    }
-    /**
-     * createRefObj
-     * purpose: creates a reference object using a simple object
-     * User input is needed to create the simple objects
-     * @return
-     */
-    private static RefObj createRefObj(){
-        System.out.println("Let's create a reference object.\n");
-        System.out.println("We'll have to create a simple object for reference.");
-
-        //call simple object to be create and get user prompts
-        SimpleObj simpleObj = createSimpleObj();
-        //create reference object based off simpleObject
-        RefObj refObj = new RefObj(simpleObj);
-
-        System.out.println("Great we have a reference object created!!!");
-        return refObj;
-    }
-
-
     /**
      * serializeObjects
      * purpose: Serializes objects, creates xml doc, and sends file to server side.

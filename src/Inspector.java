@@ -30,7 +30,7 @@ public class Inspector {
 
             System.out.println("inside inspector: " + obj.getClass().getTypeName() + " (recursive = "+recursive+")");
 
-            if(obj.getClass().isArray()){		// This checks if the non-primitive types are an array and inspects them
+            if(obj.getClass().isArray()){
 
                 for(int i = 0; i < Array.getLength(obj); i++){
                     System.out.println("Element at index " + i + " = ");

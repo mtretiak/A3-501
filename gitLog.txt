@@ -1,0 +1,43 @@
+commit 57fbc539b96a7ce067737216a2100fac2c21dabc
+Author: Michael Treitak <mtretiak@me.com>
+Date:   Wed Nov 15 14:02:34 2017 -0700
+
+    not working 100%
+    
+    needs refactoring
+
+commit 52c7664323464ef818ecd0984b8e1481f3b9711c
+Author: Michael Treitak <mtretiak@me.com>
+Date:   Tue Nov 14 20:37:21 2017 -0700
+
+    Major refactoring needs to be done. CAN NOT get user input to work.
+
+commit 00e195e04c18b1f0e959f1092d86e7e8b35b3ce8
+Author: Michael Treitak <mtretiak@me.com>
+Date:   Sun Nov 12 23:19:40 2017 -0700
+
+    Deserializer created. Fixed issues with print.
+    TODO: Lots?, Fix output, make it so the user can choose which object to create.
+
+commit ffddf2badbf3439c968b1ba55c2cc9a8e8f5dcca
+Author: Michael Treitak <mtretiak@me.com>
+Date:   Sun Nov 12 12:13:41 2017 -0700
+
+    Client, Server, and dummbyObject created.
+    TODO: deserializer, error handling, object creation rather than dummby.
+
+commit a8ee76dca565c75556fd38a3fb9da1a0cd8a57a5
+Author: Michael Treitak <mtretiak@me.com>
+Date:   Sat Nov 11 22:52:32 2017 -0700
+
+    Serializer template made. Test tomorrow. Done for night.
+    
+    Lots to do: Client, Server, Deserialize, etc ....
+
+commit 5267ce8fff651459f83728f1b92ec605e9acefb1
+Author: Michael Treitak <mtretiak@me.com>
+Date:   Sat Nov 11 21:53:08 2017 -0700
+
+    FIRST PUSSSH
+    
+    first push. nothing done but jDom import

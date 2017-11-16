@@ -5,13 +5,13 @@
       <value>1</value>
     </field>
     <field name="simpleDouble" declaringClass="SimpleObj">
-      <value>1.0</value>
+      <value>5.0</value>
     </field>
     <field name="simpleFloat" declaringClass="SimpleObj">
-      <value>65.0</value>
+      <value>34.0</value>
     </field>
     <field name="simpleByte" declaringClass="SimpleObj">
-      <value>3</value>
+      <value>2</value>
     </field>
   </object>
 </serialized>
