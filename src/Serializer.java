@@ -42,7 +42,7 @@ public class Serializer{
      * @return
      */
 
-    public static Document serializeHelp(IdentityHashMap hashMap, Document document, Object objectTBS) {
+    private static Document serializeHelp(IdentityHashMap hashMap, Document document, Object objectTBS) {
 
 
         //utlities needed
@@ -54,6 +54,8 @@ public class Serializer{
         Element reference;
         Element fieldE;
 
+        Class objectClass = objectTBS.getClass();
+
         try {
             //set id for the object to the size of the hashmap
             String objId = Integer.toString(hashMap.size());
@@ -61,16 +63,20 @@ public class Serializer{
 
             //create attributes
             obj = new Element("object");
-            obj.setAttribute("class", objectTBS.getClass().getName());
+            obj.setAttribute("class", objectClass.getName());
             obj.setAttribute("id", objId);
             document.getRootElement().addContent(obj);
 
 
             //checks if array
-            if(objectTBS.getClass().isArray()){
+            if(objectClass.isArray()){
+
+                String arrayLength = String.valueOf(Array.getLength(objectTBS));
+                obj.setAttribute("length", arrayLength);
 
                 //gets the type of array for the elements to be recreated
-                Class elementType = objectTBS.getClass().getComponentType();
+                Class elementType = objectClass.getComponentType();
+
 
                 for(int i=0; i < Array.getLength(objectTBS); i++){
                     if(elementType.isPrimitive()){
@@ -113,44 +119,15 @@ public class Serializer{
                     objectField.setAccessible(true);
                 }
 
+
                 Object fieldObj = objectField.get(objectTBS);
 
-                //when field is not null serialize
-                if(fieldObj != null){
+                fieldE = serializeFields(fieldObj, objectField,  hashMap,document);
 
-                    String dClass = objectField.getDeclaringClass().getName();
-                    String fName = objectField.getName();
-                    fieldE = new Element("field");
-                    fieldE.setAttribute("name", fName);
-                    fieldE.setAttribute("declaringClass", dClass);
-
-                    Element fieldValue = new Element("value");
-                    Element fieldReference = new Element("reference");
-
-                    Class fType = objectField.getType();
-
-
-                    if (!fType.isPrimitive()) {
-                        String fieldObjId = Integer.toString(hashMap.size());
-
-                        fieldReference.addContent(objId);
-
-                        fieldE.setContent(fieldReference);
-
-
-                        serializeHelp(hashMap, document, fieldObj);
-                    } else {
-                        String fValue = fieldObj.toString();
-                        fieldValue.addContent(fValue);
-
-                        fieldE.setContent(fieldValue);
-                    }
-                }else{
-                    fieldE = new Element("null");
-
-                }
                 System.out.println(objectField.getName());
+
                 obj.addContent(fieldE);
+
             }
 
         }
@@ -161,49 +138,69 @@ public class Serializer{
         //return serialized object as Document
         return document;
     }
+
+    /**
+     * serializeFields
+     * purpose: serialize each field before sending as it is
+     * a special case
+     * @param fieldObj
+     * @param objectField
+     * @param hashMap
+     * @param document
+     * @return
+     */
+    public static Element serializeFields( Object fieldObj, Field objectField, IdentityHashMap hashMap, Document document){
+
+        if(!Modifier.isPublic(objectField.getModifiers())){
+            objectField.setAccessible(true);
+        }
+
+        Element fieldElement;
+
+        if(fieldObj != null){
+            fieldElement = new Element("field");
+
+            try{
+                String declaringClass =  objectField.getDeclaringClass().getName();
+                String name = objectField.getName();
+                fieldElement.setAttribute("name", name);
+                fieldElement.setAttribute("declaringclass", declaringClass);
+
+                Element value = new Element("value");
+                Element reference = new Element("reference");
+
+                Class fieldType = objectField.getType();
+
+                if(!fieldType.isPrimitive()){
+
+                    String fieldObjId = Integer.toString(hashMap.size());
+                    reference.addContent(fieldObjId);
+                    fieldElement.setContent(reference);
+
+                    //pass back through since it is a reference to another object
+                    serializeHelp(hashMap, document, fieldObj);
+                }
+                else{
+                    String fieldValue = fieldObj.toString();
+                    value.addContent(fieldValue);
+                    fieldElement.setContent(value);
+                }
+            }
+            catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+        else {
+            fieldElement = new Element("null");
+        }
+
+        return fieldElement;
+
+    }
+
+
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

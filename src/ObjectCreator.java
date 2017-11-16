@@ -116,6 +116,11 @@ public class ObjectCreator {
         int length = userInput.nextInt();
         int[] newArray = new int[length];
 
+        for(int i = 0; i< newArray.length;i++)
+        {
+            System.out.println(newArray[i]);
+        }
+
         SimpleArray simpleArray = new SimpleArray(newArray);
         System.out.println("simple array has been made.");
         return simpleArray;
@@ -160,10 +165,10 @@ public class ObjectCreator {
             System.out.println("Please enter a integer between 1-4");
         }
 
-        while(userInput.nextInt()>4){
-            userInput.next();
-            System.out.println("Number is toooooo high. Try Again: ");
-        }
+//        while(userInput.nextInt()>4){
+//            userInput.next();
+//            System.out.println("Number is toooooo high. Try Again: ");
+//        }
 
         objectAmount = userInput.nextInt();
 
@@ -173,8 +178,8 @@ public class ObjectCreator {
 
 
         for(int i = 0 ; i<objectAmount; i++){
-
-            SimpleObject simpleObject = new SimpleObject();
+//            System.out.println("HHEREREREREREER");
+            SimpleObject simpleObject = createSimpleObj();
             collectionParameter.add(simpleObject);
 
         }

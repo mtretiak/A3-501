@@ -87,7 +87,7 @@ public class Client {
             }
             //collection not working
             else if(objectToCreate.equals("collection")){
-                objectArray.add(objCreator.createRefObj());
+                objectArray.add(objCreator.createCollectionObject());
             }
             else if(objectToCreate.equals("send")){
                 serializeObjects(host, port);

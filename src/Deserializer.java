@@ -1,7 +1,4 @@
-import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.HashMap;
 import java.util.List;
 import org.jdom2.Document;
@@ -20,171 +17,223 @@ public class Deserializer {
      * @param document
      * @return
      */
+    /**
+     * Deserialize document and build object from from document contents
+     * @param document - Document of serialized object, to now be deserialized
+     * @return deserialized object
+     */
     public static Object deserialize(Document document){
+        //get root element and list of nested object elements
+        Element rootElement = document.getRootElement();
+        List objList = rootElement.getChildren();
+        HashMap objMap =  new HashMap();
 
-       Element root = document.getRootElement();
-       List objectList = root.getChildren();
-       HashMap hashMap = new HashMap();
-       Object object = null;
 
-       try{
-           createObject(objectList, hashMap);
+        //Object to be instantiated via deserialization
+        Object obj = null;
 
-           setFields(objectList, hashMap);;
+        try{
 
-           object = hashMap.get("0");
-       }catch (Exception e){
-           e.printStackTrace();
-       }
-       return object;
+            //create instances of each object in object list
+            createObjectInstances(objList, objMap);
 
+            //set values for object fields using field elements
+            setFieldValues(objList, objMap);
+
+            //first object in object HashMap should be main object that was serialized, main one we care about
+            obj = objMap.get("0");
+
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+
+        //return deserialized object
+        return obj;
     }
 
 
     /**
-     * createObject
-     * purpose: creates the objects
-     * @param objectList
-     * @param hashMap
+     * Deserialize value from field element content
+     * @param fieldType class type of field element
+     * @param valueElement element containing field value
+     * @return
      */
-    public static void createObject(List objectList, HashMap hashMap){
+    private static Object deserializeFieldValue(Class fieldType, Element valueElement){
 
-        for(int i = 0; i<objectList.size();i++){
+        Object valueObject = null;
+
+        if(fieldType.equals(int.class))
+            valueObject = Integer.valueOf(valueElement.getText());
+        else if(fieldType.equals(byte.class))
+            valueObject = Byte.valueOf(valueElement.getText());
+        else if(fieldType.equals(short.class))
+            valueObject = Short.valueOf(valueElement.getText());
+        else if(fieldType.equals(long.class))
+            valueObject = Long.valueOf(valueElement.getText());
+        else if(fieldType.equals(float.class))
+            valueObject = Float.valueOf(valueElement.getText());
+        else if(fieldType.equals(double.class))
+            valueObject = Double.valueOf(valueElement.getText());
+        else if(fieldType.equals(boolean.class)){
+
+            String boolString = valueElement.getText();
+
+            if(boolString.equals("true"))
+                valueObject = Boolean.TRUE;
+            else
+                valueObject = Boolean.FALSE;
+        }
+
+        return valueObject;
+    }
+
+    /**
+     * General method for deserializing a content element into an object
+     * @param classType - type of content element class
+     * @param contentElement - element that is content of another element
+     * @param objMap - HashMap of deserialized objects
+     * @return
+     */
+    private static Object deserializeContentElement(Class classType, Element contentElement, HashMap objMap){
+        Object contentObject;
+
+        String contentType = contentElement.getName();
+
+        if(contentType.equals("reference")){
+            contentObject = objMap.get(contentElement.getText());
+        }
+        else if(contentType.equals("value"))
+            contentObject = deserializeFieldValue(classType, contentElement);
+        else
+            contentObject = contentElement.getText();
+
+
+        return contentObject;
+    }
+
+    /**
+     * Create instances for all object elements from Document
+     * @param objList - list of object elements from Document
+     * @param objMap - HashMap of deserialized objects
+     */
+    private static void createObjectInstances(List objList, HashMap objMap){
+        for(int i =0; i < objList.size(); i++){
             try{
-                Element objectE = (Element) objectList.get(i);
+                Element objElement = (Element) objList.get(i);
 
-                Class objectClass = Class.forName(objectE.getAttributeValue("class"));
+                //create uninitialized instance using element attribute
+                Class objClass =  Class.forName(objElement.getAttributeValue("class"));
+                //System.out.println(objClass.getName());
 
-                Object objectInstance;
-                if(objectClass.isArray()){
+                //check for class type then create new instance
+                Object objInstance;
+                if(objClass.isArray()){
 
-                    //get length of array
-                    int length = Integer.parseInt(objectE.getAttributeValue("length"));
-                    //get type of array
-                    Class type = objectClass.getComponentType();
+                    //get length (via element attributes) and component type of array object instantiation
+                    int arrayLength = Integer.parseInt(objElement.getAttributeValue("length"));
+                    Class arrayType = objClass.getComponentType();
 
-                    //build new array
-                    objectInstance = Array.newInstance(type, length);
-                }else{
+                    objInstance = Array.newInstance(arrayType, arrayLength);
 
-                    //is not array
-                    Constructor constructor = objectClass.getConstructor(null);
-
+                }
+                else{
+                    //non-array object, instantiate with no arg constructor
+                    Constructor constructor =  objClass.getConstructor(null);
+                    //check constructor modifiers, just in case
                     if(!Modifier.isPublic(constructor.getModifiers())){
                         constructor.setAccessible(true);
                     }
 
-                    objectInstance = constructor.newInstance(null);
+                    objInstance = constructor.newInstance(null);
                 }
 
-                String objectId = objectE.getAttributeValue("id");
-                hashMap.put(objectId, objectInstance);
-             }catch (Exception e){
-                e.printStackTrace();
-
+                //associate the new instance with the object's unique id (element attribute)
+                String objId = objElement.getAttributeValue("id");
+                objMap.put(objId, objInstance);
             }
-
+            catch(Exception e){
+                e.printStackTrace();
+            }
         }
 
     }
 
     /**
-     * setFields
-     * purpose: finds all attributes of the elements and creates fields from them
-     * @param objectList
-     * @param hashMap
+     * set values for fields using field element attributes from Document
+     * @param objList - list of objects from Document
+     * @param objMap - HashMap of deserialized objects
      */
-    public static void setFields(List objectList, HashMap hashMap){
-        for(int i = 0; i<objectList.size(); i++){
+    private static void setFieldValues(List objList, HashMap objMap){
+        for(int i =0; i < objList.size(); i++){
             try{
-                Element objectE = (Element) objectList.get(i);
-                Object objectInstance = hashMap.get(objectE.getAttributeValue("id"));
-                List children = objectE.getChildren();
+                Element objElement = (Element) objList.get(i);
 
-                Class objectClass = objectInstance.getClass();
-                System.out.println(objectClass.getName());
+                Object objInstance =  objMap.get(objElement.getAttributeValue("id"));
 
-                if(objectClass.isArray()){
-                    Class type = objectClass.getComponentType();
-                    for(int n = 0; n < children.size(); n++){
-                        Element arrayElements = (Element) children.get(n);
 
-                        Object object;
+                //get list of all children of object element (fields if non-array, elements if array)
+                List objChildrenList = objElement.getChildren();
 
-                        String elementType = arrayElements.getName();
 
-                        if(elementType.equals("reference")){
-                            object = hashMap.get(arrayElements.getText());
-                        }else if(elementType.equals("value")){
-                            object = deserializeField(type, arrayElements);
-                        }else{
-                            object = arrayElements.getText();
-                        }
-                    }
-                }else{
-                    //is not array
-                    for(int n = 0; n<children.size(); n++) {
-                        //for all children
+                // if array object, set value of each element
+                // if non-array object, assign values to all fields/instance variables
+                Class objClass = objInstance.getClass();
+                System.out.println(objClass.getName());
 
-                        Element fieldE = (Element) children.get(n);
+//                System.out.println("HEREREREREER " + objClass.isArray() + " " + objClass.getName());
 
-                        String name = fieldE.getAttributeValue("name");
-                        Class declaringClass = Class.forName(fieldE.getAttributeValue("declaringclass"));
-                        Field field = declaringClass.getDeclaredField(name);
+                if(objClass.isArray()){
 
-                        if (!Modifier.isPublic(field.getModifiers())) {
-                            //set so we can access
-                            field.setAccessible(true);
-                            Field modifiers = Field.class.getDeclaredField("modifiers");
-                        }
 
-                        Class type = field.getType();
-                        Element fieldContent = (Element) fieldE.getChildren().get(0);
-                        Object obj;
-                        if (type.equals("reference")) {
-                            obj = hashMap.get(fieldContent.getText());
-                        } else if (type.equals("value")) {
-                            obj = deserializeField(type, fieldContent);
-                        } else {
-                            obj = fieldContent.getText();
-                        }
+                    //set values for each array element
+                    Class arrayType =  objClass.getComponentType();
+                    for(int j= 0; j < objChildrenList.size(); j++){
+                        Element arrayContentElement = (Element) objChildrenList.get(j);
+
+                        Object arrayContent = deserializeContentElement(arrayType, arrayContentElement, objMap);
+
+                        Array.set(objInstance, j, arrayContent);
+
                     }
                 }
-            }catch (Exception e){
+                else{
+
+//                    System.out.println("HEREREREREER " + objClass.isArray() + " " + objClass.getName());
+                    //non-array object, assign values to all fields
+                    for(int j = 0; j < objChildrenList.size(); j++){
+                        Element fieldElement = (Element) objChildrenList.get(j);
+
+                        //get declaring class and field name (via field attributes) and load Field metaobject dynamically
+                        Class declaringClass =  Class.forName(fieldElement.getAttributeValue("declaringclass"));
+                        String fieldName = fieldElement.getAttributeValue("name");
+                        Field field = declaringClass.getDeclaredField(fieldName);
+
+                        if(!Modifier.isPublic(field.getModifiers())){
+                            field.setAccessible(true);
+
+                            //in case field also has final modifier, reset modifiers field with bitwise negation
+                            Field modifiersField = Field.class.getDeclaredField("modifiers");
+                            modifiersField.setAccessible(true);
+                            modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+                        }
+
+                        //check field element content for value/reference and set accordingly
+                        Class fieldType = field.getType();
+                        Element fieldContentElement = (Element) fieldElement.getChildren().get(0);
+
+                        Object fieldContent = deserializeContentElement(fieldType, fieldContentElement, objMap);
+
+                        field.set(objInstance, fieldContent);
+                    }
+
+                }
+            }
+            catch(Exception e){
                 e.printStackTrace();
             }
 
-
         }
-    }
-
-    /**
-     * deserializeField
-     * purpose: deserializes all field based on type
-     * @param type
-     * @param value
-     * @return
-     */
-    public static Object deserializeField(Class type, Element value){
-
-        Object valueObject = null;
-
-        if(type.equals(boolean.class)){
-            String bool = value.getText();
-        }else if (type.equals(byte.class)){
-            valueObject = Byte.valueOf(value.getText());
-        }else if (type.equals(double.class)){
-            valueObject = Double.valueOf(value.getText());
-        }else if (type.equals(float.class)){
-            valueObject = Float.valueOf(value.getText());
-        }else if (type.equals(int.class)){
-            valueObject = Integer.valueOf(value.getText());
-        }else if (type.equals(long.class)){
-            valueObject = Long.valueOf(value.getText());
-        }else if (type.equals(short.class)){
-            valueObject = Short.valueOf(value.getText());
-        }
-
-        return valueObject;
+        //end of loop, object list should be deserialized and instantiated
     }
 }

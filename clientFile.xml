@@ -1,17 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <serialized>
-  <object class="SimpleObject" id="0">
-    <field name="simpleInt" declaringClass="SimpleObject">
-      <value>1</value>
+  <object class="SimpleArray" id="0">
+    <field name="array" declaringclass="SimpleArray">
+      <reference>1</reference>
     </field>
-    <field name="simpleDouble" declaringClass="SimpleObject">
-      <value>5.0</value>
-    </field>
-    <field name="simpleFloat" declaringClass="SimpleObject">
-      <value>34.0</value>
-    </field>
-    <field name="simpleByte" declaringClass="SimpleObject">
-      <value>2</value>
-    </field>
+  </object>
+  <object class="[I" id="1" length="3">
+    <value>0</value>
+    <value>0</value>
+    <value>0</value>
   </object>
 </serialized>

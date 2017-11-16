@@ -1,3 +1,31 @@
+commit 8fef882cad566232379ef09a0dd3239045e8e125
+Author: Michael Treitak <mtretiak@me.com>
+Date:   Thu Nov 16 00:21:47 2017 -0700
+
+    refactored to only include imports needed
+
+commit ee2ed78d145f16d1951e76bf6135b2638b64dd4f
+Author: Michael Treitak <mtretiak@me.com>
+Date:   Wed Nov 15 23:33:58 2017 -0700
+
+    Simple refactoring of comments
+
+commit 80d71922940dd3e37e8199bb22cf100bf9fbc1c1
+Author: Michael Treitak <mtretiak@me.com>
+Date:   Wed Nov 15 23:07:30 2017 -0700
+
+    Refactored with "rename method" this was due to poor naming habits, and rushed time.
+
+commit c0d41f5543a635115106e75e5eb6a3ff453987dc
+Author: Michael Treitak <mtretiak@me.com>
+Date:   Wed Nov 15 23:05:00 2017 -0700
+
+    Create new objectCreator
+    
+    created new objectCreator class to clean up main. (Refactoring: remove
+    class)
+    created collection object creator
+
 commit 57fbc539b96a7ce067737216a2100fac2c21dabc
 Author: Michael Treitak <mtretiak@me.com>
 Date:   Wed Nov 15 14:02:34 2017 -0700

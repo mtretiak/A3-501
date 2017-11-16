@@ -1,6 +1,6 @@
 
 import org.jdom2.Document;
-import org.jdom2.input.SAXBuilder;
+import org.jdom2.input.*;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -28,7 +28,7 @@ public class Server {
             InputStream inputStream = socket.getInputStream();
             FileOutputStream fileOutputStream = new FileOutputStream(file);
 
-            byte[] byteArray = new byte[10000];
+            byte[] byteArray = new byte[1024*1024];
             int i = 0;
             while((i = inputStream.read(byteArray))>0){
                 fileOutputStream.write(byteArray, 0, i);
