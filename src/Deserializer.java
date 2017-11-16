@@ -1,17 +1,12 @@
-import java.io.File;
-import java.io.ObjectOutputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.List;
-
-import org.jdom2.Attribute;
-import org.jdom2.Content;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.input.SAXBuilder;
+
 
 /**
  * Created by mtretiak on 2017-11-12.

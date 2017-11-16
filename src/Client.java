@@ -1,12 +1,17 @@
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
+
 import java.io.*;
-import java.net.*;
-import java.util.*;
-import org.jdom2.*;
-import org.jdom2.output.*;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 /**
  * Created by mtretiak on 2017-11-12.
  */
+
 
 /**
  * Purpose: to get user input on client side to prepare objects, arrays, etc to be serialized

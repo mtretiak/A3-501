@@ -1,19 +1,10 @@
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
-
-import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
+
 
 /**
  * Created by mtretiak on 2017-11-11.
