@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.List;
@@ -17,14 +18,19 @@ import org.jdom2.input.SAXBuilder;
  */
 public class Deserializer {
 
-
+    /**
+     * deserialize
+     * purpose: this builds the objects after deserializing the xml document it has been passed.
+     * this is done on the server end.
+     * @param document
+     * @return
+     */
     public static Object deserialize(Document document){
 
        Element root = document.getRootElement();
        List objectList = root.getChildren();
        HashMap hashMap = new HashMap();
        Object object = null;
-
 
        try{
            createObject(objectList, hashMap);
@@ -35,14 +41,17 @@ public class Deserializer {
        }catch (Exception e){
            e.printStackTrace();
        }
-
-
        return object;
 
     }
 
 
-
+    /**
+     * createObject
+     * purpose: creates the objects
+     * @param objectList
+     * @param hashMap
+     */
     public static void createObject(List objectList, HashMap hashMap){
 
         for(int i = 0; i<objectList.size();i++){
@@ -54,13 +63,16 @@ public class Deserializer {
                 Object objectInstance;
                 if(objectClass.isArray()){
 
+                    //get length of array
                     int length = Integer.parseInt(objectE.getAttributeValue("length"));
-
+                    //get type of array
                     Class type = objectClass.getComponentType();
 
+                    //build new array
                     objectInstance = Array.newInstance(type, length);
                 }else{
 
+                    //is not array
                     Constructor constructor = objectClass.getConstructor(null);
 
                     if(!Modifier.isPublic(constructor.getModifiers())){
@@ -81,6 +93,12 @@ public class Deserializer {
 
     }
 
+    /**
+     * setFields
+     * purpose: finds all attributes of the elements and creates fields from them
+     * @param objectList
+     * @param hashMap
+     */
     public static void setFields(List objectList, HashMap hashMap){
         for(int i = 0; i<objectList.size(); i++){
             try{
@@ -108,15 +126,50 @@ public class Deserializer {
                             object = arrayElements.getText();
                         }
                     }
+                }else{
+                    //is not array
+                    for(int n = 0; n<children.size(); n++) {
+                        //for all children
+
+                        Element fieldE = (Element) children.get(n);
+
+                        String name = fieldE.getAttributeValue("name");
+                        Class declaringClass = Class.forName(fieldE.getAttributeValue("declaringclass"));
+                        Field field = declaringClass.getDeclaredField(name);
+
+                        if (!Modifier.isPublic(field.getModifiers())) {
+                            //set so we can access
+                            field.setAccessible(true);
+                            Field modifiers = Field.class.getDeclaredField("modifiers");
+                        }
+
+                        Class type = field.getType();
+                        Element fieldContent = (Element) fieldE.getChildren().get(0);
+                        Object obj;
+                        if (type.equals("reference")) {
+                            obj = hashMap.get(fieldContent.getText());
+                        } else if (type.equals("value")) {
+                            obj = deserializeField(type, fieldContent);
+                        } else {
+                            obj = fieldContent.getText();
+                        }
+                    }
                 }
             }catch (Exception e){
                 e.printStackTrace();
             }
+
+
         }
     }
 
-
-
+    /**
+     * deserializeField
+     * purpose: deserializes all field based on type
+     * @param type
+     * @param value
+     * @return
+     */
     public static Object deserializeField(Class type, Element value){
 
         Object valueObject = null;
