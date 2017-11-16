@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <serialized>
-  <object class="SimpleObj" id="0">
-    <field name="simpleInt" declaringClass="SimpleObj">
+  <object class="SimpleObject" id="0">
+    <field name="simpleInt" declaringClass="SimpleObject">
       <value>1</value>
     </field>
-    <field name="simpleDouble" declaringClass="SimpleObj">
+    <field name="simpleDouble" declaringClass="SimpleObject">
       <value>5.0</value>
     </field>
-    <field name="simpleFloat" declaringClass="SimpleObj">
+    <field name="simpleFloat" declaringClass="SimpleObject">
       <value>34.0</value>
     </field>
-    <field name="simpleByte" declaringClass="SimpleObj">
+    <field name="simpleByte" declaringClass="SimpleObject">
       <value>2</value>
     </field>
   </object>

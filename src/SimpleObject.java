@@ -3,7 +3,7 @@ import java.io.Serializable;
 /**
  * Created by mtretiak on 2017-11-14.
  */
-public class SimpleObj implements Serializable {
+public class SimpleObject implements Serializable {
 
 
     private int simpleInt;
@@ -11,12 +11,12 @@ public class SimpleObj implements Serializable {
     float simpleFloat;
     byte simpleByte;
 
-    public SimpleObj(){
+    public SimpleObject(){
     //for reconstruction
     }
 
 
-    public SimpleObj(int pInt, double pDouble, float pFloat, byte pByte){
+    public SimpleObject(int pInt, double pDouble, float pFloat, byte pByte){
         simpleDouble = pDouble;
         simpleInt = pInt;
         simpleFloat = pFloat;

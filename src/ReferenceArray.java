@@ -1,15 +1,15 @@
 /**
  * Created by mtretiak on 2017-11-15.
  */
-public class RefArray {
+public class ReferenceArray {
 
     public Object[] array;
 
-    public RefArray(Object[] newArray){
+    public ReferenceArray(Object[] newArray){
         array = newArray;
     }
 
-    public RefArray(){
+    public ReferenceArray(){
         //for reconstruction
     }
 }

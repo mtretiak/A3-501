@@ -17,12 +17,12 @@ public class ObjectCreator {
      * this creates a simple object with double, int, float, and byte values
      * @return
      */
-    public static SimpleObj createSimpleObj(){
+    public static SimpleObject createSimpleObj(){
 
         //prompt for user input
         System.out.println("Enter the parameters for your simple object. One at a time.");
 
-        SimpleObj simpleObj = null;
+        SimpleObject simpleObject = null;
         Scanner input = new Scanner(System.in);
 
         //prompt for user input of first parameter in our simple object
@@ -61,11 +61,11 @@ public class ObjectCreator {
 
 
         //creates simple object with userInput parameters
-        simpleObj = new SimpleObj(integerParameter,doubleParameter, floatParameter, byteParameter);
+        simpleObject = new SimpleObject(integerParameter,doubleParameter, floatParameter, byteParameter);
         System.out.print("Your simple object has bee created with " + integerParameter + " and " + doubleParameter + " as parameters.");
 
 
-        return simpleObj;
+        return simpleObject;
     }
 
     /**
@@ -74,7 +74,7 @@ public class ObjectCreator {
      * User input is needed to create the simple objects
      * @return
      */
-    public static RefArray createRefArray(){
+    public static ReferenceArray createRefArray(){
         System.out.println("Enter the length of your array: ");
 
         Scanner userInput = new Scanner(System.in);
@@ -88,13 +88,13 @@ public class ObjectCreator {
         Object[] newArray = new Object[length];
 
         for(int i = 0; i<length; i++){
-            SimpleObj simpleObj = createSimpleObj();
-            newArray[i] = simpleObj;
+            SimpleObject simpleObject = createSimpleObj();
+            newArray[i] = simpleObject;
         }
 
-        RefArray refArray = new RefArray(newArray);
+        ReferenceArray referenceArray = new ReferenceArray(newArray);
         System.out.println("reference array has been made.");
-        return refArray;
+        return referenceArray;
 
     }
 
@@ -128,17 +128,17 @@ public class ObjectCreator {
      //     * User input is needed to create the simple objects
      //     * @return
      //     */
-    public static RefObj createRefObj(){
+    public static ReferenceObject createRefObj(){
         System.out.println("Let's create a reference object.\n");
         System.out.println("We'll have to create a simple object for reference.");
 
         //call simple object to be create and get user prompts
-        SimpleObj simpleObj = createSimpleObj();
+        SimpleObject simpleObject = createSimpleObj();
         //create reference object based off simpleObject
-        RefObj refObj = new RefObj(simpleObj);
+        ReferenceObject referenceObject = new ReferenceObject(simpleObject);
 
         System.out.println("Great we have a reference object created!!!");
-        return refObj;
+        return referenceObject;
     }
 
     /**
@@ -169,13 +169,13 @@ public class ObjectCreator {
 
         CollectionObject collectionObj = new CollectionObject();
 
-        ArrayList<SimpleObj> collectionParameter = new ArrayList<>();
+        ArrayList<SimpleObject> collectionParameter = new ArrayList<>();
 
 
         for(int i = 0 ; i<objectAmount; i++){
 
-            SimpleObj simpleObj = new SimpleObj();
-            collectionParameter.add(simpleObj);
+            SimpleObject simpleObject = new SimpleObject();
+            collectionParameter.add(simpleObject);
 
         }
 
